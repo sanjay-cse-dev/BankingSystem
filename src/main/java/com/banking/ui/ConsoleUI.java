@@ -2,11 +2,13 @@ package com.banking.ui;
 
 import com.banking.models.Account;
 import com.banking.services.BankingServices;
+
 import java.util.Scanner;
 
 public class ConsoleUI {
-    private BankingServices bankingService;
-    private Scanner scanner;
+
+    private final BankingServices bankingService;
+    private final Scanner scanner;
 
     public ConsoleUI(BankingServices bankingService) {
         this.bankingService = bankingService;
@@ -14,77 +16,168 @@ public class ConsoleUI {
     }
 
     public void start() {
-        System.out.println("1) Register\n2) Login\n3) Exit\n---- CHOSE OPTIONS ----");
 
-        int c = scanner.nextInt();
-        if(c == 1){
-            System.out.println("Enter your Name: ");
-            String name = scanner.next();
-            System.out.println("Enter your PIN: ");
-            int pin = scanner.nextInt();
-            System.out.println("Enter Initial Amount: ");
-            double initialDeposit = scanner.nextDouble();
-            String accountNumber = bankingService.registerAccount(name, pin, initialDeposit);
-            if(accountNumber == null){
-                start();
-            }else{
-                System.out.println("Registered Successfully !");
-                System.out.println("--- Your Account Detail ---");
-                System.out.println("Name : " +name+ "\nAccount Number : " +accountNumber);
-                System.out.println("Remember these details for Operations");
-                start();
-            }
-        }else if(c == 2){
-            System.out.println("Enter your account Number: ");
-            String accountNumber = scanner.next();
-            System.out.println("Enter your 4 digit PIN: ");
-            int pin = scanner.nextInt();
-            Account account = bankingService.login(accountNumber,pin);
-            if(account == null){
-                System.out.println("Please Enter correct account number and PIN !");
-                start();
-            }else{
-                System.out.println("Login Successful !");
-                while (true) {
-                    System.out.println("\n--- Banking System ---");
-                    System.out.println("1. Deposit");
-                    System.out.println("2. Withdraw");
-                    System.out.println("0. Exit");
-                    System.out.print("Choose an option: ");
+        boolean running = true;
 
-                    int choice = scanner.nextInt();
-                    if(choice == 0) break;
-                    if(choice == 1){
-                        System.out.println("Enter amount you want to deposit: ");
-                        double amount = scanner.nextDouble();
-                        bankingService.deposit(amount,account);
-                        System.out.println("Your have added: "+amount+"\nYour total balance is : "+account.getBalance());
-                    }else if(choice == 2){
-                        System.out.println("Enter Amount to withdraw : ");
-                        double amount = scanner.nextDouble();
-                        System.out.println("Enter four digit PIN again : ");
-                        pin = scanner.nextInt();
-                        boolean success = bankingService.withdraw(amount,account, pin);
-                        if(success){
-                            System.out.println(
-                                    "You have withdrawn: " + amount +
-                                    "\nYour total balance is: " + account.getBalance()
-                            );
-                        }else{
-                            System.out.println("Invalid deposit amount!");
-                        }
-                    }else{
-                        System.out.println("Invalid !");
-                        start();
+        while (running) {
+
+            System.out.println("\n===== BANKING SYSTEM =====");
+            System.out.println("1. Register");
+            System.out.println("2. Login");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+
+                case 1:
+                    registerUser();
+                    break;
+
+                case 2:
+                    Account account = loginUser();
+
+                    if (account != null) {
+                        showAccountMenu(account);
                     }
-                }
+
+                    break;
+
+                case 3:
+                    running = false;
+                    System.out.println("Thank you for using Banking System!");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice!");
             }
-        }else if(c == 3){
-            return;
-        }else{
-            System.out.println("Invalid Input!");
-            start();
         }
     }
 
+
+    private void registerUser() {
+
+        System.out.println("\n===== REGISTER =====");
+
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter 4 Digit PIN: ");
+        int pin = scanner.nextInt();
+
+        System.out.print("Enter Initial Deposit: ");
+        double initialDeposit = scanner.nextDouble();
+
+        scanner.nextLine();
+
+        String accountNumber = bankingService.registerAccount(name,pin,initialDeposit);
+
+        if (accountNumber != null) {
+            System.out.println("\nAccount created successfully!");
+            System.out.println("Your Account Number: " + accountNumber);
+        } else {
+            System.out.println("\nAccount registration failed.");
+        }
+    }
+
+
+    private Account loginUser() {
+
+        System.out.println("\n===== LOGIN =====");
+
+        System.out.print("Enter Account Number: ");
+        String accountNumber = scanner.nextLine();
+
+        System.out.print("Enter PIN: ");
+        int pin = scanner.nextInt();
+        scanner.nextLine();
+
+        Account account = bankingService.login(accountNumber, pin);
+
+        if (account == null) {
+            System.out.println("Invalid Account Number or PIN.");
+            return null;
+        }
+
+        System.out.println("\nLogin successful!");
+        System.out.println("Welcome, " + account.getAccountHolderName());
+
+        return account;
+    }
+
+
+    private void showAccountMenu(Account account) {
+
+        boolean loggedIn = true;
+
+        while (loggedIn) {
+
+            System.out.println("\n===== ACCOUNT MENU =====");
+            System.out.println("1. Deposit");
+            System.out.println("2. Withdraw");
+            System.out.println("3. Check Balance");
+            System.out.println("4. Logout");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+
+                case 1:
+                    depositMoney(account);
+                    break;
+
+                case 2:
+                    withdrawMoney(account);
+                    break;
+
+                case 3:
+                    System.out.println("Current Balance: ₹" + bankingService.checkBalance(account));
+                    break;
+
+                case 4:
+                    loggedIn = false;
+                    System.out.println("Logged out successfully.");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+
+
+    private void depositMoney(Account account) {
+
+        System.out.print("Enter amount to deposit: ");
+        double amount = scanner.nextDouble();
+
+        boolean success = bankingService.deposit(amount, account);
+
+        if (success) {
+            System.out.println("Deposited: ₹" + amount + "\nNew Balance: ₹" + account.getBalance());
+        } else {
+            System.out.println("Invalid deposit amount.");
+        }
+    }
+
+
+    private void withdrawMoney(Account account) {
+
+        System.out.print("Enter amount to withdraw: ");
+        double amount = scanner.nextDouble();
+
+        System.out.print("Enter PIN: ");
+        int pin = scanner.nextInt();
+
+        boolean success = bankingService.withdraw(amount, account, pin);
+
+        if (success) {
+            System.out.println("Withdrawn: ₹" + amount + "\nNew Balance: ₹" + account.getBalance());
+        } else {
+            System.out.println("Withdrawal failed.");
+        }
+    }
 }

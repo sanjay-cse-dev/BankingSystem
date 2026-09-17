@@ -17,7 +17,6 @@ public class Account {
     }
 
     // Getters
-
     public String getAccountNumber() {
         return accountNumber;
     }
@@ -39,8 +38,8 @@ public class Account {
     }
 
     // Setters
-    public void setPin(int newpin) {
-        this.pin = newpin;
+    public void setPin(int pin) {
+        this.pin = pin;
     }
 
     public void setActive(boolean active) {
