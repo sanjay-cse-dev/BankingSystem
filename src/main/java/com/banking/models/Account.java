@@ -5,7 +5,6 @@ public class Account {
     private String accountHolderName;
     private int pin;
     private double balance;
-    private boolean isActive;
 
     // Constructor
     public Account(String accountNumber, String accountHolderName, int pin, double initialBalance) {
@@ -13,7 +12,6 @@ public class Account {
         this.accountHolderName = accountHolderName;
         this.pin = pin;
         this.balance = initialBalance;
-        this.isActive = true;
     }
 
     // Getters
@@ -25,25 +23,17 @@ public class Account {
         return accountHolderName;
     }
 
-    public int getPin(){
-        return pin;
-    }
-
     public double getBalance() {
         return balance;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public boolean verifyPin(int pin){
+        return this.pin == pin;
     }
 
     // Setters
     public void setPin(int pin) {
         this.pin = pin;
-    }
-
-    public void setActive(boolean active) {
-        this.isActive = active;
     }
 
     public void setAccountHolderName(String accountHolderName) {

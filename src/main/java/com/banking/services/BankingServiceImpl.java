@@ -37,7 +37,7 @@ public class BankingServiceImpl implements BankingServices{
     public Account login(String accountNumber, int pin){
         Account account = repository.getAccount(accountNumber);
         if(account != null){
-            if(account.getPin() == pin){
+            if(account.verifyPin(pin)){
                 return account;
             }
             else{
@@ -59,7 +59,7 @@ public class BankingServiceImpl implements BankingServices{
             return false;
         }
 
-        if (account.getPin() != pin) {
+        if (!account.verifyPin(pin)) {
             System.out.println("Enter Valid PIN!");
             return false;
         }
