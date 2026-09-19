@@ -1,5 +1,8 @@
 package com.banking.models;
 
+import com.banking.exception.InvalidAmountException;
+import com.banking.exception.InvalidPinException;
+
 public class Account {
     private String accountNumber;
     private String accountHolderName;
@@ -28,7 +31,7 @@ public class Account {
     }
 
     public boolean verifyPin(int pin){
-        return this.pin == pin;
+        throw new InvalidPinException("Invalid PIN.");
     }
 
     // Setters
@@ -41,15 +44,22 @@ public class Account {
     }
 
     public boolean withdraw(double amount){
-        if(amount > balance) return false;
-
+        if(amount <= 0) {
+            throw new InvalidAmountException("Withdraw amount must be greater than zero");
+        }
+        if(amount > balance){
+            throw new InvalidAmountException("Insufficient balance!");
+        }
+        if(amount > 1_00_000){
+            throw new InvalidAmountException("You cannot withdraw amount more than ₹1,00,000 at once!");
+        }
         this.balance -= amount;
         return true;
     }
 
     public boolean deposit(double amount){
         if(amount <= 0){
-            return false;
+            throw new InvalidAmountException("Deposit amount must be greater than zero");
         }
         balance += amount;
         return true;

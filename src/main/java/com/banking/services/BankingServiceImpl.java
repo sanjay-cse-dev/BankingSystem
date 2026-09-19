@@ -8,9 +8,11 @@ public class BankingServiceImpl implements BankingServices{
 
     private AccountRepository repository;
 
+
     public BankingServiceImpl(AccountRepository repository) {
         this.repository = repository;
     }
+
 
     @Override
     public String registerAccount(String name, int pin, double initialDeposit){
@@ -33,6 +35,7 @@ public class BankingServiceImpl implements BankingServices{
         return newAccountNumber;
     }
 
+
     @Override
     public Account login(String accountNumber, int pin){
         Account account = repository.getAccount(accountNumber);
@@ -48,17 +51,15 @@ public class BankingServiceImpl implements BankingServices{
         }
     }
 
+
     @Override
     public boolean deposit(double amount, Account account){
         return amount > 0 && account.deposit(amount);
     }
 
+
     @Override
     public boolean withdraw(double amount, Account account, int pin){
-        if (amount <= 0) {
-            return false;
-        }
-
         if (!account.verifyPin(pin)) {
             System.out.println("Enter Valid PIN!");
             return false;
@@ -70,6 +71,7 @@ public class BankingServiceImpl implements BankingServices{
         }
         return true;
     }
+
 
     @Override
     public double checkBalance(Account account){
